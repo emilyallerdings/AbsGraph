@@ -20,10 +20,9 @@ class AbstractedGraph:
             pointsfinal = points
         return pointsfinal
         
-    def __init__(self, randomwalkenv, iterations):
+    def __init__(self, graph, iterations):
     
         self.colors = np.random.rand(100, 3)
-        graph = randomwalkenv
         
         num = iterations
         self.n_panels = 2
@@ -112,8 +111,10 @@ class AbstractedGraph:
         
         plt.subplot(1, 2, 1)
          
-        if type(self.graphs[g1]) is RandomWalkEnvironment:
-            self.graphs[g1].plot(testcolors)
+        if type(self.graphs[g1]) is RandomWalkGraph:
+            nx.draw(self.graphs[g1].G, with_labels=False,pos=nx.get_node_attributes(self.graphs[g1].G,'pos'),
+            node_color=[testcolors.get(node, [0, 0, 0]) for node in self.graphs[g1].G],
+            node_size=50)
         else:
             nx.draw(self.graphs[g1], with_labels=False,
             node_color=[testcolors.get(node, [0, 0, 0]) for node in self.graphs[g1]],
