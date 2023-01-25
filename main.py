@@ -1,10 +1,10 @@
 
-from hippocluster.graphs.environment import RandomWalkEnvironment
+from environment import RandomWalkEnvironment
 from absgraph import AbstractedGraph
 
 
 graph = RandomWalkEnvironment()
 
-absgraph = AbstractedGraph(graph, 4)
+absgraph = AbstractedGraph(graph, 1)
 
-absgraph.printgraphs(1,3)
+absgraph.printgraphs(0,1)

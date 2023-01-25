@@ -1,7 +1,6 @@
-from hippocluster import RandomWalkLattice
-from hippocluster import RandomWalkEnvironment
-from hippocluster import Hippocluster
-from hippocluster import RandomWalkGraph
+from hippocluster.algorithms.hippocluster import Hippocluster
+from hippocluster.graphs.abstract import RandomWalkGraph
+from environment import RandomWalkEnvironment
 import matplotlib.pyplot as plt
 import numpy as np
 import networkx as nx
@@ -11,7 +10,6 @@ import random
 class AbstractedGraph:
 
     def get_higher_nodes(self, node_num, cur_layer, to_layer) -> list:
-        #print(node_num)
         
         pointsfinal = []
         points={node for node, cluster in self.assignmentslist[cur_layer].items() if cluster == node_num}
@@ -93,13 +91,7 @@ class AbstractedGraph:
         plt.show()  
 
     def printgraphs(self, g1, g2):
-    
-    
-            
         plt.clf()
-        # print(self.graphs[g1].nodes)
-        # print(self.graphs[g2].nodes)
-        # plt.clf()
         
         plt.subplot(1, 2, 2)
     
@@ -109,9 +101,7 @@ class AbstractedGraph:
         node_color=[node_colors.get(node, [0, 0, 0]) for node in self.graphs[g2]],
         node_size=400)
 
-
         testcolors={}
-
             
         for node in self.graphs[g2]:
             for parent in self.get_higher_nodes(node, g2-1, g1):
