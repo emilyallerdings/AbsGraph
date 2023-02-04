@@ -10,11 +10,12 @@ def add_edge_to_graph(G, e1, e2):
     G.add_edge(e1, e2)
 
 points = []
-edges = []
+edges = []  # todo: is this list used?
 T = tables.TTable()
 T = pickle.load( open( "t_walls_grid_world.p", "rb" ) )
 G = nx.Graph()
 
+# todo: converting the T table to a graph this way is smart, but we should find a way to use the T-table probabilities as edge weights for the new graph (I can help with that)
 for state in T.get_all_states():
 
     for state2 in T.get_states_accessible_from(state):

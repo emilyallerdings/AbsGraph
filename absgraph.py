@@ -39,18 +39,17 @@ class AbstractedGraph:
                 drop_threshold=0.001
             )
         
-            for step in range(1000):
+            for step in range(1000):  # todo: it should be sufficient to show hippocluster 10*N walks
 
                 # get a batch of random walks
                 walks = [
-                    set(graph.unweighted_random_walk(length=random.randint(int(self.nclusters/2) + 2, self.nclusters+2)))
+                    set(graph.unweighted_random_walk(length=random.randint(int(self.nclusters/2) + 2, self.nclusters+2)))  # todo: clustering will work best if walk lengths are comparable to cluster size (N/k)
                     for _ in range(self.nclusters*5 if step == 0 else self.nclusters)
                 ]
-           
-                
+
                 # update the clustering
                 hippocluster.update(walks)
-                assignments = hippocluster.get_assignments(graph)
+                assignments = hippocluster.get_assignments(graph)  # todo: it will save time to just do this once after the loop
                 
             print("inserting assignment at %d" % count)
             self.assignmentslist.insert(count,assignments)
@@ -63,6 +62,7 @@ class AbstractedGraph:
                 cluster1 = assignments.get(edge[0])
                 cluster2 = assignments.get(edge[1])
                 if(cluster1 != cluster2):
+                    # todo: I'm not sure this logic is quite right wrt the new weights - I think the new weight should be either the sum or the max of the weights in the previous graph
                     newG.add_edge(cluster1, cluster2, weight = 0)
                     test = newG[cluster1][cluster2]['weight']
                     newG[cluster1][cluster2]['weight'] = test + 1
@@ -95,10 +95,17 @@ class AbstractedGraph:
         plt.subplot(1, 2, 2)
     
         node_colors={node: self.colors[node][::-1] for node in self.graphs[g2].nodes}
-        
-        nx.draw(self.graphs[g2], with_labels=False,
-        node_color=[node_colors.get(node, [0, 0, 0]) for node in self.graphs[g2]],
-        node_size=400)
+
+        pos = nx.spring_layout(self.graphs[g2])
+        nx.draw(self.graphs[g2],
+                pos=pos,
+                with_labels=False,
+                node_color=[node_colors.get(node, [0, 0, 0]) for node in self.graphs[g2]],
+                node_size=400)
+        # add edge weights
+        labels = nx.get_edge_attributes(self.graphs[g2], 'weight')
+        nx.draw_networkx_edge_labels(self.graphs[g2], pos, edge_labels=labels)
+
 
         testcolors={}
             
