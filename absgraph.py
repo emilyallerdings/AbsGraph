@@ -73,7 +73,7 @@ class AbstractedGraph:
             self.nclusters = int(len(set(assignments.values()))/2)
             graph = RandomWalkGraph(newG)
             
-    def printgraph(self, g1):
+    def printgraph(self, g1):  # todo: is this method used?
         plt.subplot(1, 1, 1)
         
         
