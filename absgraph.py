@@ -54,7 +54,7 @@ class AbstractedGraph:
             print("inserting assignment at %d" % count)
             self.assignmentslist.insert(count,assignments)
      
-            newG = nx.Graph()
+            newG = nx.DiGraph()
             for nodenum in set(assignments.values()):
                 newG.add_node(nodenum)
 
