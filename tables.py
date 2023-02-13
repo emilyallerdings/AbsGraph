@@ -96,6 +96,25 @@ class TTable:
         """
         return set(itertools.chain(*[x.keys() for x in self.backward_map[state].values()]))
 
+    def get_random_transition_probabilities_from(self, state):
+        """
+        returns a probability distribution over next states after executing a random action from 'state'
+        :param state: starting state
+        :return: dict of new_state -> probability
+        """
+        if state not in self.forward_map:
+            return dict()
+
+        p = dict()
+
+        action_dict = self.forward_map[state]
+        for new_state_counts in action_dict.values():
+            total_count = sum(new_state_counts.values())
+            for new_state in new_state_counts:
+                p[new_state] = p.get(new_state, 0) + new_state_counts[new_state] / total_count / len(action_dict)
+
+        return p
+
     def get_state_actions_with_access_to(self, state):
         """
         returns state-action tuples that have given access to the specified state (inferred from table entries)
@@ -111,9 +130,9 @@ class TTable:
     
     def get_all_states(self):
         """
-        :return: all the states stored in the forward_map
+        :return: all the states stored in the table
         """
-        return list(self.forward_map.keys())
+        return list(set(self.forward_map).union(set(self.backward_map)))
 
     def get_state_probabilities_from_state_action(self, state, action):
         """
