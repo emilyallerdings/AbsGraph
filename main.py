@@ -10,5 +10,5 @@ G = t_table_to_graph(
     pos_calculator=lambda state: (state[0], state[1])
 )
 
-absgraph = AbstractedGraph(G,1)
+absgraph = AbstractedGraph(G,1, T)
 absgraph.printgraphs(0,1)
