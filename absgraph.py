@@ -52,7 +52,7 @@ class AbstractedGraph:
     def get_lower_abstraction_nodes(self, node_num, cur_layer, to_layer) -> list:
 
         pointsfinal = []
-        points = {node for node, cluster in self.assignmentslist[cur_layer].items() if cluster == node_num}
+        points = {node for node, cluster in self.assignmentslist[cur_layer-1].items() if cluster == node_num}
         if (cur_layer > to_layer):
             for point in points:
                 pointsfinal += (self.get_lower_abstraction_nodes(point, cur_layer - 1, to_layer))
@@ -139,7 +139,7 @@ class AbstractedGraph:
         testcolors={}
             
         for node in self.graphs[g2]:
-            for parent in self.get_lower_abstraction_nodes(node, g2-1, g1):
+            for parent in self.get_lower_abstraction_nodes(node, g2, g1):
                 #print(parent)
                 testcolors[parent] = self.colors[node][::-1]
         
