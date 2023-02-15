@@ -10,5 +10,6 @@ G = t_table_to_graph(
     pos_calculator=lambda state: (state[0], state[1])
 )
 
-absgraph = AbstractedGraph(G,3, T)
-print(absgraph.get_lower_abstraction_nodes(1,3,2))
+absgraph = AbstractedGraph(G,1, T)
+#absgraph.get_lower_abstraction_nodes(1,1,0)
+absgraph.print_all(1,10)

@@ -50,10 +50,16 @@ class AbstractedGraph:
         return node_num
 
     def get_lower_abstraction_nodes(self, node_num, cur_layer, to_layer) -> list:
-
         pointsfinal = []
-        points = {node for node, cluster in self.assignmentslist[cur_layer-1].items() if cluster == node_num}
-        if (cur_layer > to_layer):
+        points = []
+
+        #print(self.assignmentslist[cur_layer-1])
+
+        for node in self.assignmentslist[cur_layer-1]:
+            if self.assignmentslist[cur_layer-1][node] == node_num:
+                points.append(node)
+        #points = {node for node, cluster in self.assignmentslist[cur_layer-1].keys() if cluster == node_num}
+        if (cur_layer-1 > to_layer):
             for point in points:
                 pointsfinal += (self.get_lower_abstraction_nodes(point, cur_layer - 1, to_layer))
         else:
