@@ -9,18 +9,58 @@ import random
 
 class AbstractedGraph:
 
-    def get_higher_nodes(self, node_num, cur_layer, to_layer) -> list:
-        
+    def print_all(self, num_iterations, env_node_size):
+        plt.clf()
+
+        for i in range(1, num_iterations + 1):
+            plt.subplot(2, num_iterations, i)
+            node_colors = {node: self.colors[node][::-1] for node in self.graphs[i].nodes}
+
+            nx.draw(
+                self.graphs[i],
+                with_labels=True,
+                node_color=[node_colors.get(node, [0, 0, 0]) for node in self.graphs[i]],
+                node_size=100,
+            )
+
+            testcolors = {}
+
+            for node in self.graphs[i]:
+                for parent in self.get_lower_abstraction_nodes(node, i - 1, 0):
+                    testcolors[parent] = self.colors[node][::-1]
+
+            plt.subplot(2, num_iterations, i + num_iterations)
+
+            nx.draw(
+                self.graphs[0].G,
+                with_labels=False,
+                pos=nx.get_node_attributes(self.graphs[0].G, "pos"),
+                node_color=[
+                    testcolors.get(node, [0, 0, 0]) for node in self.graphs[0].G
+                ],
+                node_size=env_node_size,
+            )
+
+        plt.tight_layout()
+        plt.show()
+    def get_higher_abstraction_nodes(self, node_num, cur_layer, to_layer) -> list:
+        while cur_layer < to_layer:
+            node_num = self.assignmentslist[cur_layer][node_num]
+            cur_layer += 1
+        return node_num
+
+    def get_lower_abstraction_nodes(self, node_num, cur_layer, to_layer) -> list:
+
         pointsfinal = []
-        points={node for node, cluster in self.assignmentslist[cur_layer].items() if cluster == node_num}
-        if ( cur_layer > to_layer ):
+        points = {node for node, cluster in self.assignmentslist[cur_layer].items() if cluster == node_num}
+        if (cur_layer > to_layer):
             for point in points:
-                pointsfinal += (self.get_higher_nodes(point, cur_layer-1, to_layer))
+                pointsfinal += (self.get_lower_abstraction_nodes(point, cur_layer - 1, to_layer))
         else:
             pointsfinal = points
         return pointsfinal
         
-    def __init__(self, graph, iterations):
+    def __init__(self, graph, iterations, T):
     
         self.colors = np.random.rand(100, 3)
         
@@ -42,8 +82,9 @@ class AbstractedGraph:
             for step in range(1000):  # todo: it should be sufficient to show hippocluster 10*N walks
 
                 # get a batch of random walks
+
                 walks = [
-                    set(graph.unweighted_random_walk(length=random.randint(int(self.nclusters/2) + 2, self.nclusters+2)))  # todo: clustering will work best if walk lengths are comparable to cluster size (N/k)
+                    set(graph.unweighted_random_walk(length=random.randint(int(self.nclusters/2) + 2, self.nclusters+2)))
                     for _ in range(self.nclusters*5 if step == 0 else self.nclusters)
                 ]
 
@@ -61,33 +102,21 @@ class AbstractedGraph:
             for edge in graph.G.edges:
                 cluster1 = assignments.get(edge[0])
                 cluster2 = assignments.get(edge[1])
-                if(cluster1 != cluster2):
+                if(cluster1 != cluster2 or edge[0] == edge[1]):
                     # todo: I'm not sure this logic is quite right wrt the new weights - I think the new weight should be either the sum or the max of the weights in the previous graph
-                    newG.add_edge(cluster1, cluster2, weight = 0)
-                    test = newG[cluster1][cluster2]['weight']
-                    newG[cluster1][cluster2]['weight'] = test + 1
+                    if newG.has_edge(cluster1, cluster2):
+                        test = newG[cluster1][cluster2]['weight']
+                        newG[cluster1][cluster2]['weight'] = test + graph.G[edge[0]][edge[1]]['weight']
+                    else:
+                        newG.add_edge(cluster1, cluster2, weight = 0)
+                        test = newG[cluster1][cluster2]['weight']
+                        newG[cluster1][cluster2]['weight'] = test + graph.G[edge[0]][edge[1]]['weight']
             
             print("inserting graph at %d" % count)
             self.graphs.insert(count+1, newG)
             
             self.nclusters = int(len(set(assignments.values()))/2)
             graph = RandomWalkGraph(newG)
-            
-    def printgraph(self, g1):  # todo: is this method used?
-        plt.subplot(1, 1, 1)
-        
-        
-        
-        if type(self.graphs[g1]) is RandomWalkEnvironment:
-            self.graphs[g1].plot(node_colors={node: self.colors[cluster][::-1] for node, cluster in self.assignmentslist[g1].items()})
-            
-        else:
-            node_colors={node: self.colors[node][::-1] for node in self.graphs[g1].nodes}
-            nx.draw(self.graphs[g1], with_labels=False,
-            node_color=[node_colors.get(node, [0, 0, 0]) for node in self.graphs[g1]],
-            node_size=400)
-        
-        plt.show()  
 
     def printgraphs(self, g1, g2):
         plt.clf()
@@ -110,7 +139,7 @@ class AbstractedGraph:
         testcolors={}
             
         for node in self.graphs[g2]:
-            for parent in self.get_higher_nodes(node, g2-1, g1):
+            for parent in self.get_lower_abstraction_nodes(node, g2-1, g1):
                 #print(parent)
                 testcolors[parent] = self.colors[node][::-1]
         
